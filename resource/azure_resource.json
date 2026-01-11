@@ -1,0 +1,63 @@
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location":{"type": "string","defaultValue": "East US"},
+    "nsgName": {"type": "string","defaultValue": "sanu-project1-nsg"}   
+  },
+  "resources": [
+    { 
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2025-03-01",
+      "name": "sanu-project1-vnet",
+      "location": "parameters[location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [ "10.10.0.0/16" ]
+        },
+        "enableDdosProtection": "false",
+        "enableVmProtection": "false",
+        "subnets": [
+          {
+            "name": "sanu-web-subnet",
+            "properties": {
+              "addressPrefix": "10.10.1.0/24",
+              "networkSecurityGroup": { "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]" }
+            }
+          },
+          {
+            "name": "sanu-app-subnet",
+            "properties": {
+              "addressPrefix": "10.10.2.0/24",
+              "networkSecurityGroup": { "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]" }
+
+            }
+          },
+          {
+            "name": "sanu-data-subnet",
+            "properties": {
+              "addressPrefix": "10.10.3.0/24",
+              "networkSecurityGroup": { "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]" }
+            }
+          }
+        ]
+    },
+    "tags": {
+      "name": "sanu"
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2025-03-01",
+      "location":"parameters[location]",
+      "name": "parameters[nsgName]",
+      "properties": {
+        "securityRules": []
+      }
+    }
+  ]
+}
